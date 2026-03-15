@@ -68,3 +68,10 @@ if __name__ == "__main__":
         result = [s for s in students if name.lower() in s["name"].lower()]
 
         return jsonify(result)
+    
+@app.route("/students/search", methods=["GET"])
+def search_students():
+    name = request.args.get("name")
+    students = load_students()
+    results = [s for s in students if name.lower() in s["name"].lower()]
+    return jsonify(results)
