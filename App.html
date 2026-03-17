@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task List</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 0;
+            background: url("4c4070da-bd06-4d3f-9a14-7e383c399814.jpg") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 6px;
+            border: none;
+        }
+
+        input, select {
+            width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .task-input {
+            display: flex;
+            gap: 5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+        }
+
+        .low { background: green; }
+        .medium { background: orange; }
+        .high { background: red; }
+
+        .actions button {
+            margin-left: 5px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Task List</h1>
+
+    <!-- Search -->
+    <div class="search-bar">
+        🔍 <input type="text" id="searchInput" placeholder="Search tasks..." onkeyup="loadTasks()">
+    </div>
+
+    <!-- Add Task -->
+    <div class="task-input">
+        <input type="text" id="taskInput" placeholder="Enter task">
+        <select id="priority">
+            <option value="low">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="high">Urgent</option>
+        </select>
+        <button onclick="addTask()">Add</button>
+    </div>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+function loadTasks() {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let search = document.getElementById("searchInput").value.toLowerCase();
+
+    const list = document.getElementById("taskList");
+    list.innerHTML = "";
+
+    tasks.forEach((task, index) => {
+        if (!task.text.toLowerCase().includes(search)) return;
+
+        let li = document.createElement("li");
+        li.className = task.priority;
+
+        li.innerHTML = `
+            <span>${task.text}</span>
+            <div class="actions">
+                <button onclick="editTask(${index})">✏️</button>
+                <button onclick="deleteTask(${index})">🗑️</button>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+function addTask() {
+    let text = document.getElementById("taskInput").value;
+    let priority = document.getElementById("priority").value;
+
+    if (!text) {
+        alert("Enter a task");
+        return;
+    }
+
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    tasks.push({ text, priority });
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    document.getElementById("taskInput").value = "";
+
+    loadTasks();
+}
+
+function deleteTask(index) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.splice(index, 1);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    loadTasks();
+}
+
+function editTask(index) {
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    let newText = prompt("Edit task:", tasks[index].text);
+
+    if (newText) {
+        tasks[index].text = newText;
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        loadTasks();
+    }
+}
+
+window.onload = loadTasks;
+</script>
+
+</body>
+</html>
